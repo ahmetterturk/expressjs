@@ -15,3 +15,27 @@ routes.get("/:postID", (request, response) => {
         `Received a GET request for a post with ID of ${request.params.postID}`
     );
 });
+
+// Use Postman or another HTTP tool to visit a POST route.
+routes.post("/:postID", (request, response) => {
+    let submittedData = request.body;
+    console.log(JSON.stringify(submittedData));
+
+    let submittedName = request.body.name.toUpperCase();
+    submittedName += submittedName;
+
+    // // for from url encoded data
+    // let submittedPokemon = JSON.parse(request.body.favouritePokemon).name;
+
+    // for raw json data
+    let submittedPokemon = request.body.favouritePokemon.name;
+
+    response.json(
+        // `Received a POST request for a post with ID of ${request.params.postID}`
+        // `Received name of ${request.body.name}, received beard size of ${request.body.beardSize}`
+        // `Received name of ${submittedName}, received beard size of ${request.body.beardSize}`
+        `Received fave poke as ${submittedPokemon}`
+    );
+});
+
+module.exports = routes;
