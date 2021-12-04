@@ -1,10 +1,11 @@
 // require then initialize
-const firebaseClient = require("firabase/app");
+const firebaseClient = require("firebase/app");
 firebaseClient.initializeApp(JSON.parse(process.env.FIREBASE_CLIENT_CONFIG));
 
+const { getAuth, signInWithEmailAndPassword } = require("firebase/auth");
+
 // initialized elsewhere, just need to require it and thats it
-const firebaseAdmin = require("firabase-admin");
-// const { UserRecord } = require("firebase-admin/lib/auth/user-record");
+const firebaseAdmin = require("firebase-admin");
 
 // signUpUser({username: 'something', email:'something@web.com', password:'password1'})
 async function signUpUser(userDetails) {
@@ -15,10 +16,10 @@ async function signUpUser(userDetails) {
             password: userDetails.password,
             displayName: userDetails.username,
             emailVerified: true,
-            // phoroURL: "freestck.com/image"
+            // photoURL: "freestck.com/image"
         })
         .then(async (userRecord) => {
-            let defaultUserClaimes = firebaseAdmin
+            let defaultUserClaims = firebaseAdmin
                 .auth()
                 .setCustomUserClaims(userRecord.uid, {
                     admin: false,
@@ -35,3 +36,40 @@ async function signUpUser(userDetails) {
             return { error: error };
         });
 }
+
+async function signInUser(userDetails) {
+    const firebaseClientAuth = getAuth();
+
+    let signInResult = signInWithEmailAndPassword(
+        firebaseClientAuth,
+        userDetails.email,
+        userDetails.password
+    )
+        .then(async (userCredential) => {
+            let userIdToken =
+                await firebaseClientAuth.currentUser.getIdTokenResult(false);
+
+            console.log(`userIdToken obj is\n ${JSON.stringify(userIdToken)}`);
+
+            return {
+                idToken: userIdToken.token,
+                refreshToken: userCredential.user.refreshToken,
+                email: userCredential.user.email,
+                emailVerified: userCredential.user.emailVerified,
+                displayName: userCredential.user.displayName,
+                photoURL: userCredential.user.photoURL,
+                uid: userCredential.user.uid,
+            };
+        })
+        .catch((error) => {
+            console.log("Internal signin function error is: \n" + error);
+            return { error: error };
+        });
+
+    return signInResult;
+}
+
+module.exports = {
+    signUpUser,
+    signInUser,
+};

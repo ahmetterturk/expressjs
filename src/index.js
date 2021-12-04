@@ -28,6 +28,9 @@ app.get("/", (req, res) => {
 const importedPostRouting = require("./Posts/postsRoutes");
 app.use("/posts", importedPostRouting);
 
+const importedUserRouting = require("./Users/userRoutes");
+app.use("/users", importedUserRouting);
+
 app.listen(PORT, HOST, () => {
     console.log("Server is running on port " + PORT);
 });
