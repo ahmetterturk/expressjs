@@ -1,4 +1,5 @@
 const express = require("express");
+const { randomNumberGenerator } = require("./postsFunctions");
 
 // Create a bundle of routes. We'll export this out and then import it into src/index.js.
 const routes = express.Router();
@@ -7,6 +8,11 @@ const routes = express.Router();
 // Its actual name in the URL will depend on how it's configured in src/index.js
 routes.get("/", (request, response) => {
     response.json(`Received a request on ${request.originalUrl}`);
+});
+
+routes.get("/randomNumber", (request, response) => {
+    // response.send(randomNumberGenerator().toString());
+    response.send(`<h1>${randomNumberGenerator()}</h1>`);
 });
 
 // Set up route params with the colon before the name.
