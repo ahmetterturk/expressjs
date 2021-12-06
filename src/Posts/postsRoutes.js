@@ -1,47 +1,66 @@
 const express = require("express");
-const { randomNumberGenerator } = require("./postsFunctions");
+const {
+    randomNumberGenerator,
+    someAsyncFunction,
+    getAllPosts,
+    createSpecificPost,
+} = require("./postsFunctions");
 
-// Create a bundle of routes. We'll export this out and then import it into src/index.js.
 const routes = express.Router();
 
-// This is the "root" route for the Router instance.
-// Its actual name in the URL will depend on how it's configured in src/index.js
-routes.get("/", (request, response) => {
-    response.json(`Received a request on ${request.originalUrl}`);
+// get all posts
+routes.get("/", async (request, response) => {
+    let allPosts = await getAllPosts();
+    response.json(allPosts);
+
+    //response.json(`Received a request on ${request.originalUrl}`);
 });
 
-routes.get("/randomNumber", (request, response) => {
-    // response.send(randomNumberGenerator().toString());
+// create a new post
+routes.post("/", async (request, response) => {
+    //let tempPostDetails = {}
+    //let creationResult = await createSpecificPost(tempPostDetails)
+    let creationResult = await createSpecificPost({
+        postTitle: request.body.postTitle,
+        postContent: request.body.postContent,
+        postAuthorID: request.body.postAuthorID,
+        postRating: request.body.postRating,
+    });
+
+    response.json(creationResult);
+});
+
+routes.get("/randomNumber", async (request, response) => {
+    let asyncResult = await someAsyncFunction();
     response.send(`<h1>${randomNumberGenerator()}</h1>`);
 });
 
-// Set up route params with the colon before the name.
 routes.get("/:postID", (request, response) => {
-    response.json(
-        `Received a GET request for a post with ID of ${request.params.postID}`
-    );
+    response.json(`Route param was ${request.params.postID}`);
 });
 
-// Use Postman or another HTTP tool to visit a POST route.
-routes.post("/:postID", (request, response) => {
-    let submittedData = request.body;
-    console.log(JSON.stringify(submittedData));
+// routes.post('/:postID', (request, response) => {
 
-    let submittedName = request.body.name.toUpperCase();
-    submittedName += submittedName;
+//     let submittedData = request.body;
 
-    // // for from url encoded data
-    // let submittedPokemon = JSON.parse(request.body.favouritePokemon).name;
+//     console.log(JSON.stringify(submittedData));
 
-    // for raw json data
-    let submittedPokemon = request.body.favouritePokemon.name;
+//     let submittedName = request.body.name.toUpperCase();
+//     submittedName += submittedName;
 
-    response.json(
-        // `Received a POST request for a post with ID of ${request.params.postID}`
-        // `Received name of ${request.body.name}, received beard size of ${request.body.beardSize}`
-        // `Received name of ${submittedName}, received beard size of ${request.body.beardSize}`
-        `Received fave poke as ${submittedPokemon}`
-    );
-});
+//     // for form urlencoded submission
+//     //let submittedPokemon = JSON.parse(request.body.favouritePokemon).name;
+
+//     // for raw json submission
+//     let submittedPokemon = request.body.favouritePokemon.name;
+
+//     response.json(`Received fave Pokemon of ${submittedPokemon} `)
+// });
+
+// routes.get('/:username/status/:postID', (request, response) => {
+
+//     response.json(`Route param was ${request.params}`)
+
+// });
 
 module.exports = routes;
